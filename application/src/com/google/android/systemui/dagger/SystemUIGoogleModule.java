@@ -369,14 +369,6 @@ public abstract class SystemUIGoogleModule {
         return new AmbientIndicationRepository();
     }
 
-    @Provides
-    @SysUISingleton
-    static AmbientIndicationInteractor provideAmbientIndicationInteractor(
-            AmbientIndicationRepository repository,
-            KeyguardInteractor keyguardInteractor) {
-        return new AmbientIndicationInteractor(repository, keyguardInteractor);
-    }
-
     @Binds
     @Named(KeyguardSectionsModule.KEYGUARD_AMBIENT_INDICATION_AREA_SECTION)
     abstract KeyguardSection bindDefaultAmbientIndicationAreaSection(
