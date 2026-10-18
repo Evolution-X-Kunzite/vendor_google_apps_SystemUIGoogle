@@ -80,12 +80,14 @@ constructor(
         val isLowUdfps by axDynamicBarChipViewModel.isLowUdfps.collectAsStateWithLifecycle()
         val ambientMusic by viewModel.ambientIndicationMusicState.collectAsStateWithLifecycle()
         val devicePlayingMusic by viewModel.devicePlayingMusic.collectAsStateWithLifecycle()
+        val lyricsShowing by viewModel.lyricsShowing.collectAsStateWithLifecycle()
 
         // A search or a recognized song has to be visible even while the low-UDFPS chip is
-        // using this slot. Playback on the phone is not that song.
-        val showingNowPlaying = ambientMusic != null && !devicePlayingMusic
+        // using this slot. Playback on the phone is not that song, but its lyrics are shown.
+        val canShow = !devicePlayingMusic || lyricsShowing
+        val showingNowPlaying = ambientMusic != null && canShow
         val showNowPlayingView =
-            if (isLowUdfps) showingNowPlaying || chipHeight == 0 else !devicePlayingMusic
+            if (isLowUdfps) showingNowPlaying || chipHeight == 0 else canShow
 
         Box(modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             // On a low fingerprint sensor the lower-region row covers the sensor, so the

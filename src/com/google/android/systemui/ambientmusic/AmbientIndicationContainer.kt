@@ -116,6 +116,7 @@ open class AmbientIndicationContainer(context: Context, attrs: AttributeSet) :
     var mPowerInteractor: PowerInteractor? = null
     lateinit var mRealTextSet: LinearLayout
     var mStatusBarState: Int = 0
+    var mShowingLyrics: Boolean = false
     lateinit var mTempTextSet: LinearLayout
     lateinit var mTempTextView: TextView
     lateinit var mTempTextViewExtended: TextView
@@ -332,7 +333,8 @@ open class AmbientIndicationContainer(context: Context, attrs: AttributeSet) :
     override fun onPrimaryMetadataOrStateChanged(metadata: MediaMetadata?, state: Int) {
         if (mMediaPlaybackState != state) {
             mMediaPlaybackState = state
-            if (NotificationMediaManager.isPlayingState(state)) {
+            // Playback clears a recognition result, but lyrics are shown because of it.
+            if (NotificationMediaManager.isPlayingState(state) && !mShowingLyrics) {
                 setAmbientMusic(null, null, null, 0, false, null, null)
             }
         }
