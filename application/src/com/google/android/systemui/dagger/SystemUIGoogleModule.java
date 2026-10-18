@@ -118,6 +118,7 @@ import com.android.systemui.wallpapers.dagger.WallpaperModule;
 
 import com.google.android.systemui.battery.BatterySaverModuleGoogle;
 import com.google.android.systemui.gesture.GestureModuleGoogle;
+import com.google.android.systemui.ambientmusic.nonpixel.NonPixelAmbientIndicationCoreStartable;
 import com.google.android.systemui.keyguard.AmbientIndicationCoreStartable;
 import com.google.android.systemui.keyguard.data.quickaffordance.CalculatorQuickAffordanceConfig;
 import com.google.android.systemui.keyguard.data.quickaffordance.CalendarQuickAffordanceConfig;
@@ -355,6 +356,12 @@ public abstract class SystemUIGoogleModule {
     @ClassKey(AmbientIndicationCoreStartable.class)
     abstract CoreStartable bindAmbientIndicationCoreStartable(
             AmbientIndicationCoreStartable impl);
+
+    @Binds
+    @IntoMap
+    @ClassKey(NonPixelAmbientIndicationCoreStartable.class)
+    abstract CoreStartable bindNonPixelAmbientIndicationCoreStartable(
+            NonPixelAmbientIndicationCoreStartable impl);
 
     @Provides
     @SysUISingleton

@@ -34,6 +34,8 @@ constructor(
     val ambientIndicationMusicState: StateFlow<AmbientIndicationMusic?> =
         ambientIndicationInteractor.ambientMusicState
 
+    val devicePlayingMusic: StateFlow<Boolean> = ambientIndicationInteractor.devicePlayingMusic
+
     private val burnInFlow: Flow<BurnInModel> =
         combine(
                 burnInInteractor.burnIn(
