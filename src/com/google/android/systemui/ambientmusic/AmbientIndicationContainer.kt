@@ -648,8 +648,14 @@ open class AmbientIndicationContainer(context: Context, attrs: AttributeSet) :
             } else {
                 context.getString(R.string.accessibility_now_playing_like_icon)
             }
-        if (dmpPackageName.isNullOrEmpty() || expandedIndicationData.dmpIntent == null) {
+        if (expandedIndicationData.dmpIntent == null) {
             mAmbientIndicationPlayContainer.visibility = View.GONE
+            return
+        }
+        if (dmpPackageName.isNullOrEmpty()) {
+            // No single target app (e.g. the system chooser), so use a generic icon.
+            mAmbientIndicationPlayIcon.setImageResource(R.drawable.ic_now_playing_play)
+            mAmbientIndicationPlayContainer.visibility = View.VISIBLE
             return
         }
         var applicationIcon: Drawable? = mMusicAppIconCache.get(dmpPackageName)
