@@ -1212,6 +1212,13 @@ open class AmbientIndicationContainer(context: Context, attrs: AttributeSet) :
             return
         }
 
+        if (mExtendedIndication?.isSongSearching != true) {
+            // The searching state hides this container and relies on a delayed animation to
+            // bring it back. Make sure leaving that state never leaves it invisible.
+            mAmbientIndicationCollapsedContainer.alpha = 1.0f
+            mAmbientIndicationCollapsedContainer.translationY = 0.0f
+        }
+
         if (mUsingExtendedIndication && mExtendedIndication?.isSongSearching == true) {
             mIconView.setImageDrawable(context.getDrawable(R.drawable.avd_nowplaying_searching))
             val iconDrawableNow = mIconView.drawable

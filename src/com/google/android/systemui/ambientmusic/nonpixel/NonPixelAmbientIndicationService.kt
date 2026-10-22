@@ -10,6 +10,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.media.AudioManager
+import android.media.AudioPlaybackConfiguration
 import android.media.MediaMetadata
 import android.media.musicrecognition.MusicRecognitionManager
 import android.media.musicrecognition.RecognitionRequest
@@ -65,6 +66,7 @@ class NonPixelAmbientIndicationService(
 
             override fun onKeyguardVisibilityChanged(showing: Boolean) {
                 if (showing && isContinuousRecognitionEnabled()) {
+                    restoreOnDemandIcon()
                     scheduleNextPeriodicRecognition(20000L)
                 } else if (!showing) {
                     cancelPeriodicRecognition()
@@ -74,6 +76,17 @@ class NonPixelAmbientIndicationService(
             override fun onDreamingStateChanged(dreaming: Boolean) {
                 if (dreaming && isContinuousRecognitionEnabled()) {
                     scheduleNextPeriodicRecognition(20000L)
+                }
+            }
+        }
+
+    internal val playbackCallback: AudioManager.AudioPlaybackCallback =
+        object : AudioManager.AudioPlaybackCallback() {
+            override fun onPlaybackConfigChanged(configs: List<AudioPlaybackConfiguration>) {
+                // The interactor drops the icon when the phone starts playing music, so
+                // bring it back once playback has stopped.
+                if (!isDevicePlayingMusic()) {
+                    restoreOnDemandIcon()
                 }
             }
         }
@@ -159,6 +172,20 @@ class NonPixelAmbientIndicationService(
                 null,
             ),
         )
+    }
+
+    /** Re-posts the on-demand icon if nothing else is using the indication slot. */
+    fun restoreOnDemandIcon() {
+        if (!isOnDemandEnabled() || !isContinuousRecognitionEnabled()) {
+            return
+        }
+        if (isDevicePlayingMusic()) {
+            return
+        }
+        if (ambientIndicationInteractor.ambientMusicState.value != null) {
+            return
+        }
+        showOnDemandSearchIcon()
     }
 
     fun onSettingsChanged() {
@@ -287,6 +314,7 @@ class NonPixelAmbientIndicationService(
             ACTION_AMM_AMBIENT_INDICATION_HIDE -> {
                 alarmManager.cancel(hideIndicationListener)
                 ambientIndicationInteractor.hideAmbientMusic()
+                restoreOnDemandIcon()
             }
             ACTION_AMBIENT_INDICATION_SHOW,
             ACTION_LOCAL_AMBIENT_INDICATION_SHOW,

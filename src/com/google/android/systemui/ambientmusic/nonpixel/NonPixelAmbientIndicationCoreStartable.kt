@@ -8,6 +8,7 @@ import android.app.AlarmManager
 import android.content.Context
 import android.content.IntentFilter
 import android.database.ContentObserver
+import android.media.AudioManager
 import android.os.Handler
 import android.os.Looper
 import android.os.UserHandle
@@ -92,6 +93,11 @@ constructor(
             Context.RECEIVER_EXPORTED,
         )
         keyguardUpdateMonitor.registerCallback(nonPixelAmbientIndicationService.callback)
+        (context.getSystemService(Context.AUDIO_SERVICE) as? AudioManager)
+            ?.registerAudioPlaybackCallback(
+                nonPixelAmbientIndicationService.playbackCallback,
+                Handler(Looper.getMainLooper()),
+            )
 
         val settingsObserver = object : ContentObserver(Handler(Looper.getMainLooper())) {
             override fun onChange(selfChange: Boolean) {
