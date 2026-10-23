@@ -6,6 +6,7 @@ import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import com.android.keyguard.KeyguardUpdateMonitor
+import com.android.systemui.axdynamicbar.ui.AxDynamicBarChipViewModel
 import com.android.systemui.common.ui.domain.interactor.ConfigurationInteractor
 import com.android.systemui.dagger.SysUISingleton
 import com.android.systemui.dagger.qualifiers.Application
@@ -45,6 +46,7 @@ constructor(
     private val falsingManager: FalsingManager,
     @Main private val mainDelayableExecutor: DelayableExecutor,
     @Background private val backgroundExecutor: Executor,
+    private val axDynamicBarChipViewModel: AxDynamicBarChipViewModel,
 ) : KeyguardSection() {
 
     private var ambientIndicationAreaHandle: DisposableHandle? = null
@@ -61,7 +63,11 @@ constructor(
             R.id.ambient_indication_container,
             ConstraintLayout.LayoutParams.MATCH_PARENT,
         )
-        if (keyguardUpdateMonitor.isUdfpsSupported()) {
+        // A sensor in the bottom strip of the display leaves no room under it, so the container
+        // sits above the icon exactly like on non-UDFPS devices.
+        val belowSensor =
+            keyguardUpdateMonitor.isUdfpsSupported() && !axDynamicBarChipViewModel.isLowUdfps.value
+        if (belowSensor) {
             constraintSet.constrainHeight(R.id.ambient_indication_container, 0)
             // The layout's bottom margin only makes sense when sitting above the icon (non-UDFPS).
             // Under the sensor it eats the whole band on devices with a low sensor and the
